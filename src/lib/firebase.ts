@@ -1,13 +1,20 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp, getApps, getApp, FirebaseOptions } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  getDocs, 
+  doc, 
+  updateDoc, 
+  deleteDoc,
+  query,
+  orderBy,
+  limit
+} from "firebase/firestore";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+const firebaseConfig: FirebaseOptions = {
   projectId: "abs-build",
   appId: "1:254937340843:web:49bfffc3097a5d1547d0ee",
   storageBucket: "abs-build.firebasestorage.app",
@@ -20,5 +27,47 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Types
+export interface NewsArticle {
+  id?: string;
+  title: string;
+  date: string;
+  summary: string;
+  image: string;
+  hint: string;
+  featured: boolean;
+}
+
+export interface Project {
+    id?: string;
+    title: string;
+    image: string;
+    hint: string;
+}
+
+// Firestore collections
+const newsCollection = collection(db, "news");
+const projectsCollection = collection(db, "projects");
+
+// News CRUD
+export const addNews = (news: Omit<NewsArticle, 'id'>) => addDoc(newsCollection, news);
+export const getNews = async (): Promise<NewsArticle[]> => {
+  const q = query(newsCollection, orderBy("date", "desc"));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as NewsArticle));
+};
+export const updateNews = (id: string, news: Partial<NewsArticle>) => updateDoc(doc(db, "news", id), news);
+export const deleteNews = (id: string) => deleteDoc(doc(db, "news", id));
+
+// Projects CRUD
+export const addProject = (project: Omit<Project, 'id'>) => addDoc(projectsCollection, project);
+export const getProjects = async (): Promise<Project[]> => {
+    const snapshot = await getDocs(projectsCollection);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project));
+};
+export const updateProject = (id: string, project: Partial<Project>) => updateDoc(doc(db, "projects", id), project);
+export const deleteProject = (id: string) => deleteDoc(doc(db, "projects", id));
+
 
 export { app, auth, db };
