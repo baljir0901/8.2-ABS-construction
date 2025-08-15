@@ -18,7 +18,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "fire
 const firebaseConfig: FirebaseOptions = {
   projectId: "abs-build",
   appId: "1:254937340843:web:49bfffc3097a5d1547d0ee",
-  storageBucket: "abs-build.appspot.com",
+  storageBucket: "abs-build.firebasestorage.app",
   apiKey: "AIzaSyCMfneSxUnvaIRKZqdIY5m3wksLGjRIRac",
   authDomain: "abs-build.firebaseapp.com",
   messagingSenderId: "254937340843",
