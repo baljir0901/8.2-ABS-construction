@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { getProjects, addProject, updateProject, deleteProject, Project } from '@/lib/firebase';
+import { getProjects, addProject, updateProject, deleteProject, Project, uploadImage, deleteImage } from '@/lib/firebase';
 import Image from 'next/image';
 import {
   Dialog,
@@ -91,7 +91,7 @@ export default function ProjectsAdminPage() {
                         <Edit className="h-4 w-4" />
                         </Button>
                     </ProjectFormDialog>
-                    <DeleteProjectDialog projectId={project.id!} onSucess={fetchProjects} />
+                    <DeleteProjectDialog project={project} onSucess={fetchProjects} />
                 </div>
               </CardFooter>
             </Card>
@@ -107,11 +107,20 @@ function ProjectFormDialog({ project, onSave, children }: { project?: Project, o
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
-  const [formData, setFormData] = useState<Omit<Project, 'id'>>({
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(project?.image || null);
+  const [formData, setFormData] = useState<Omit<Project, 'id' | 'image'>>({
     title: project?.title || '',
-    image: project?.image || 'https://placehold.co/600x400.png',
     hint: project?.hint || '',
   });
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -122,11 +131,27 @@ function ProjectFormDialog({ project, onSave, children }: { project?: Project, o
     e.preventDefault();
     setIsSaving(true);
     try {
+      let imageUrl = project?.image || '';
+
+      if (imageFile) {
+        if (project?.image) {
+          await deleteImage(project.image);
+        }
+        imageUrl = await uploadImage(imageFile);
+      }
+      
+      const projectData = { ...formData, image: imageUrl };
+
       if (project?.id) {
-        await updateProject(project.id, formData);
+        await updateProject(project.id, projectData);
         toast({ title: "Амжилттай шинэчиллээ" });
       } else {
-        await addProject(formData);
+        if (!imageUrl) {
+            toast({ variant: "destructive", title: "Зураг оруулна уу." });
+            setIsSaving(false);
+            return;
+        }
+        await addProject(projectData);
         toast({ title: "Амжилттай нэмлээ" });
       }
       onSave();
@@ -159,9 +184,16 @@ function ProjectFormDialog({ project, onSave, children }: { project?: Project, o
               <Label htmlFor="title" className="text-right">Гарчиг</Label>
               <Input id="title" value={formData.title} onChange={handleChange} className="col-span-3" required />
             </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="image" className="text-right">Зургийн URL</Label>
-              <Input id="image" value={formData.image} onChange={handleChange} className="col-span-3" required />
+             <div className="grid grid-cols-4 items-start gap-4">
+              <Label className="text-right pt-2">Зураг</Label>
+               <div className='col-span-3 space-y-2'>
+                <Input id="image" type="file" onChange={handleImageChange} className="col-span-3" accept="image/*" />
+                 {imagePreview && (
+                    <div className="relative w-full h-40 rounded-md overflow-hidden border">
+                       <Image src={imagePreview} alt="Зураг" layout="fill" objectFit="cover" />
+                    </div>
+                )}
+               </div>
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="hint" className="text-right">Зургийн hint</Label>
@@ -177,7 +209,7 @@ function ProjectFormDialog({ project, onSave, children }: { project?: Project, o
   )
 }
 
-function DeleteProjectDialog({ projectId, onSucess }: { projectId: string, onSucess: () => void }) {
+function DeleteProjectDialog({ project, onSucess }: { project: Project, onSucess: () => void }) {
     const [open, setOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const { toast } = useToast();
@@ -185,7 +217,10 @@ function DeleteProjectDialog({ projectId, onSucess }: { projectId: string, onSuc
     const handleDelete = async () => {
         setIsDeleting(true);
         try {
-            await deleteProject(projectId);
+            await deleteProject(project.id!);
+            if (project.image) {
+                await deleteImage(project.image);
+            }
             toast({ title: "Амжилттай устгалаа" });
             onSucess();
             setOpen(false);

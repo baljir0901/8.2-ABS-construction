@@ -13,11 +13,12 @@ import {
   orderBy,
   limit
 } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 
 const firebaseConfig: FirebaseOptions = {
   projectId: "abs-build",
   appId: "1:254937340843:web:49bfffc3097a5d1547d0ee",
-  storageBucket: "abs-build.firebasestorage.app",
+  storageBucket: "abs-build.appspot.com",
   apiKey: "AIzaSyCMfneSxUnvaIRKZqdIY5m3wksLGjRIRac",
   authDomain: "abs-build.firebaseapp.com",
   messagingSenderId: "254937340843",
@@ -27,6 +28,7 @@ const firebaseConfig: FirebaseOptions = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // Types
 export interface NewsArticle {
@@ -45,6 +47,26 @@ export interface Project {
     image: string;
     hint: string;
 }
+
+// Storage Functions
+export const uploadImage = async (file: File) => {
+  const storageRef = ref(storage, `images/${Date.now()}_${file.name}`);
+  await uploadBytes(storageRef, file);
+  return await getDownloadURL(storageRef);
+};
+
+export const deleteImage = async (imageUrl: string) => {
+  if (!imageUrl.includes('firebasestorage.googleapis.com')) return;
+  try {
+    const imageRef = ref(storage, imageUrl);
+    await deleteObject(imageRef);
+  } catch (error: any) {
+    if (error.code !== 'storage/object-not-found') {
+        console.error("Error deleting image:", error);
+    }
+  }
+};
+
 
 // Firestore collections
 const newsCollection = collection(db, "news");
@@ -70,4 +92,4 @@ export const updateProject = (id: string, project: Partial<Project>) => updateDo
 export const deleteProject = (id: string) => deleteDoc(doc(db, "projects", id));
 
 
-export { app, auth, db };
+export { app, auth, db, storage };

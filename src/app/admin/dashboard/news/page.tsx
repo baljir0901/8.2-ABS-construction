@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { getNews, addNews, updateNews, deleteNews, NewsArticle } from '@/lib/firebase';
+import { getNews, addNews, updateNews, deleteNews, NewsArticle, uploadImage, deleteImage } from '@/lib/firebase';
 import {
   Table,
   TableBody,
@@ -27,7 +27,8 @@ import {
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Trash2, PlusCircle } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, PlusCircle, Image as ImageIcon } from 'lucide-react';
+import Image from 'next/image';
 
 export default function NewsAdminPage() {
   const [news, setNews] = useState<NewsArticle[]>([]);
@@ -92,7 +93,7 @@ export default function NewsAdminPage() {
                            <Edit className="h-4 w-4" />
                          </Button>
                        </NewsFormDialog>
-                       <DeleteNewsDialog articleId={article.id!} onSucess={fetchNews} />
+                       <DeleteNewsDialog article={article} onSucess={fetchNews} />
                     </TableCell>
                   </TableRow>
                 ))
@@ -110,14 +111,23 @@ function NewsFormDialog({ article, onSave, children }: { article?: NewsArticle, 
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
-  const [formData, setFormData] = useState<Omit<NewsArticle, 'id'>>({
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(article?.image || null);
+  const [formData, setFormData] = useState<Omit<NewsArticle, 'id' | 'image'>>({
     title: article?.title || '',
     date: article?.date || new Date().toISOString().split('T')[0],
     summary: article?.summary || '',
-    image: article?.image || 'https://placehold.co/600x400.png',
     hint: article?.hint || '',
     featured: article?.featured || false,
   });
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -132,11 +142,29 @@ function NewsFormDialog({ article, onSave, children }: { article?: NewsArticle, 
     e.preventDefault();
     setIsSaving(true);
     try {
+      let imageUrl = article?.image || '';
+      
+      // If a new image is selected, upload it
+      if (imageFile) {
+        // If there was an old image, delete it from storage
+        if (article?.image) {
+          await deleteImage(article.image);
+        }
+        imageUrl = await uploadImage(imageFile);
+      }
+
+      const newsData = { ...formData, image: imageUrl };
+
       if (article?.id) {
-        await updateNews(article.id, formData);
+        await updateNews(article.id, newsData);
         toast({ title: "Амжилттай шинэчиллээ" });
       } else {
-        await addNews(formData);
+        if (!imageUrl) {
+            toast({ variant: "destructive", title: "Зураг оруулна уу." });
+            setIsSaving(false);
+            return;
+        }
+        await addNews(newsData);
         toast({ title: "Амжилттай нэмлээ" });
       }
       onSave();
@@ -173,13 +201,20 @@ function NewsFormDialog({ article, onSave, children }: { article?: NewsArticle, 
               <Label htmlFor="date" className="text-right">Огноо</Label>
               <Input id="date" type="date" value={formData.date} onChange={handleChange} className="col-span-3" required />
             </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="summary" className="text-right">Хураангуй</Label>
+             <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="summary" className="text-right pt-2">Хураангуй</Label>
               <Textarea id="summary" value={formData.summary} onChange={handleChange} className="col-span-3" required />
             </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="image" className="text-right">Зургийн URL</Label>
-              <Input id="image" value={formData.image} onChange={handleChange} className="col-span-3" required />
+             <div className="grid grid-cols-4 items-start gap-4">
+              <Label className="text-right pt-2">Зураг</Label>
+               <div className='col-span-3 space-y-2'>
+                <Input id="image" type="file" onChange={handleImageChange} className="col-span-3" accept="image/*" />
+                 {imagePreview && (
+                    <div className="relative w-full h-40 rounded-md overflow-hidden border">
+                       <Image src={imagePreview} alt="Зураг" layout="fill" objectFit="cover" />
+                    </div>
+                )}
+               </div>
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="hint" className="text-right">Зургийн hint</Label>
@@ -199,7 +234,7 @@ function NewsFormDialog({ article, onSave, children }: { article?: NewsArticle, 
   )
 }
 
-function DeleteNewsDialog({ articleId, onSucess }: { articleId: string, onSucess: () => void }) {
+function DeleteNewsDialog({ article, onSucess }: { article: NewsArticle, onSucess: () => void }) {
     const [open, setOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const { toast } = useToast();
@@ -207,7 +242,10 @@ function DeleteNewsDialog({ articleId, onSucess }: { articleId: string, onSucess
     const handleDelete = async () => {
         setIsDeleting(true);
         try {
-            await deleteNews(articleId);
+            await deleteNews(article.id!);
+            if (article.image) {
+                await deleteImage(article.image);
+            }
             toast({ title: "Амжилттай устгалаа" });
             onSucess();
             setOpen(false);
