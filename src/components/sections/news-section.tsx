@@ -25,69 +25,59 @@ export default function NewsSection() {
     fetchNews();
   }, []);
 
-  if (loading) {
-    return (
-      <section id="news" className="py-20 lg:py-28 bg-card">
-        <div className="container mx-auto px-4">
-          <div className="text-center space-y-4 mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold font-headline text-primary">Компанийн Мэдээ</h2>
-            <p className="max-w-2xl mx-auto text-muted-foreground">
-              Салбарын болон компанийн сүүлийн үеийн мэдээ, мэдээлэлтэй танилцана уу.
-            </p>
-          </div>
+  const renderSkeletons = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {[...Array(3)].map((_, index) => (
+        <Card key={index}>
+          <Skeleton className="h-56 w-full" />
+          <CardHeader>
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-1/4" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6 mt-2" />
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+
+  return (
+    <section id="news" className="py-20 lg:py-28 bg-background">
+      <div className="container mx-auto px-4">
+        <div className="text-center space-y-4 mb-12">
+          <p className="text-primary font-semibold mb-2 text-sm tracking-widest relative after:absolute after:w-8 after:h-px after:bg-primary after:left-1/2 after:-translate-x-1/2 after:bottom-[-8px]">
+            From our blog
+          </p>
+          <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight uppercase">Мэдээлэл & Арга хэмжээ</h2>
+        </div>
+        {loading ? renderSkeletons() : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {[...Array(3)].map((_, index) => (
-              <Card key={index}>
-                <Skeleton className="h-56 w-full" />
+            {newsItems.map((item) => (
+              <Card key={item.id} className="flex flex-col overflow-hidden group border-none shadow-lg hover:shadow-2xl transition-shadow duration-300">
+                <div className="relative">
+                  <Image
+                    src={item.image || "https://placehold.co/600x400.png"}
+                    alt={item.title}
+                    width={600}
+                    height={400}
+                    className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
+                    data-ai-hint={item.hint}
+                  />
+                   {item.featured && <Badge className="absolute top-3 right-3 bg-primary text-primary-foreground">Онцлох</Badge>}
+                </div>
                 <CardHeader>
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-1/4" />
+                  <p className="text-xs text-muted-foreground pt-1">{new Date(item.date).toLocaleDateString('mn-MN')}</p>
+                  <CardTitle className="font-headline text-xl leading-tight">{item.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-5/6 mt-2" />
+                <CardContent className="flex-grow">
+                  <CardDescription>{item.summary}</CardDescription>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
-      </section>
-    )
-  }
-
-  return (
-    <section id="news" className="py-20 lg:py-28 bg-card">
-      <div className="container mx-auto px-4">
-        <div className="text-center space-y-4 mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold font-headline text-primary">Компанийн Мэдээ</h2>
-          <p className="max-w-2xl mx-auto text-muted-foreground">
-            Салбарын болон компанийн сүүлийн үеийн мэдээ, мэдээлэлтэй танилцана уу.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {newsItems.map((item) => (
-            <Card key={item.id} className="flex flex-col overflow-hidden group">
-              <div className="relative">
-                <Image
-                  src={item.image || "https://placehold.co/600x400.png"}
-                  alt={item.title}
-                  width={600}
-                  height={400}
-                  className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
-                  data-ai-hint={item.hint}
-                />
-                 {item.featured && <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground">Онцлох</Badge>}
-              </div>
-              <CardHeader>
-                <CardTitle className="font-headline text-lg">{item.title}</CardTitle>
-                <p className="text-xs text-muted-foreground pt-1">{new Date(item.date).toLocaleDateString('mn-MN')}</p>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <CardDescription>{item.summary}</CardDescription>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        )}
       </div>
     </section>
   );
