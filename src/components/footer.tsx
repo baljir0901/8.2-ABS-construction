@@ -1,6 +1,7 @@
 import Logo from "./logo";
 import { Button } from "./ui/button";
 import { Facebook, Twitter, Instagram, Linkedin, MapPin, Phone, Mail } from "lucide-react";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -13,17 +14,17 @@ export default function Footer() {
               Чанартай барилга, бат бэх ирээдүйг цогцлооно. Бид орчин үеийн шийдэл, технологид суурилсан барилга угсралтын үйлчилгээг үзүүлдэг.
             </p>
              <div className="flex space-x-2 mt-4">
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/10">
-                <Facebook className="h-5 w-5" />
+              <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-primary hover:bg-primary/10">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><Facebook className="h-5 w-5" /></a>
               </Button>
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/10">
-                <Twitter className="h-5 w-5" />
+              <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-primary hover:bg-primary/10">
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><Twitter className="h-5 w-5" /></a>
               </Button>
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/10">
-                <Instagram className="h-5 w-5" />
+              <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-primary hover:bg-primary/10">
+                 <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><Instagram className="h-5 w-5" /></a>
               </Button>
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/10">
-                <Linkedin className="h-5 w-5" />
+              <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-primary hover:bg-primary/10">
+                 <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"><Linkedin className="h-5 w-5" /></a>
               </Button>
             </div>
           </div>

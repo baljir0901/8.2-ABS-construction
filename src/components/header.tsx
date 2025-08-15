@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Logo from "./logo";
 import { Button } from "./ui/button";
-import { Menu, X, Globe, Building } from "lucide-react";
+import { Menu, X, Building } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -12,7 +12,6 @@ const navLinks = [
   { title: "Бизнесийн салбарууд", href: "#services" },
   { title: "Бүтээн байгуулалтууд", href: "#projects" },
   { title: "Мэдээ мэдээлэл", href: "#news" },
-  { title: "Хүний нөөц", href: "#careers" },
   { title: "Холбоо барих", href: "#contact" },
 ];
 
@@ -51,9 +50,6 @@ export default function Header() {
           ))}
         </nav>
         <div className="hidden lg:flex items-center space-x-2">
-            <Button variant="ghost" size="icon">
-                <Globe />
-            </Button>
              <Button variant="ghost" size="icon" asChild>
                 <Link href="/admin/dashboard">
                     <Building />
@@ -77,9 +73,6 @@ export default function Header() {
               </Link>
             ))}
              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="icon">
-                    <Globe />
-                </Button>
                 <Button variant="ghost" size="icon" asChild>
                     <Link href="/admin/dashboard">
                         <Building />
