@@ -50,6 +50,14 @@ export interface Project {
     description: string;
 }
 
+export interface Service {
+  id?: string;
+  icon: string;
+  title: string;
+  description: string;
+  order: number;
+}
+
 export interface ContactMessage {
   id?: string;
   to: string;
@@ -85,6 +93,7 @@ export const deleteImage = async (imageUrl: string) => {
 // Firestore collections
 const newsCollection = collection(db, "news");
 const projectsCollection = collection(db, "projects");
+const servicesCollection = collection(db, "services");
 const contactsCollection = collection(db, "contacts");
 
 
@@ -101,7 +110,8 @@ export const deleteNews = (id: string) => deleteDoc(doc(db, "news", id));
 // Projects CRUD
 export const addProject = (project: Omit<Project, 'id'>) => addDoc(projectsCollection, project);
 export const getProjects = async (): Promise<Project[]> => {
-    const snapshot = await getDocs(projectsCollection);
+    const q = query(projectsCollection, orderBy("title", "asc"));
+    const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project));
 };
 export const getProject = async(id: string): Promise<Project | null> => {
@@ -114,6 +124,18 @@ export const getProject = async(id: string): Promise<Project | null> => {
 }
 export const updateProject = (id: string, project: Partial<Project>) => updateDoc(doc(db, "projects", id), project);
 export const deleteProject = (id: string) => deleteDoc(doc(db, "projects", id));
+
+
+// Services CRUD
+export const addService = (service: Omit<Service, 'id'>) => addDoc(servicesCollection, service);
+export const getServices = async (): Promise<Service[]> => {
+  const q = query(servicesCollection, orderBy("order", "asc"));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Service));
+};
+export const updateService = (id: string, service: Partial<Service>) => updateDoc(doc(db, "services", id), service);
+export const deleteService = (id: string) => deleteDoc(doc(db, "services", id));
+
 
 // Contact CRUD
 export const addContactMessage = (message: Omit<ContactMessage, 'id'>) => addDoc(contactsCollection, message);
