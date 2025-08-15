@@ -16,6 +16,7 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
@@ -33,7 +34,7 @@ export default function ProjectsAdminPage() {
       const projectsData = await getProjects();
       setProjects(projectsData);
     } catch (error) {
-      toast({ variant: "destructive", title: "Тслийг татахад алдаа гарлаа" });
+      toast({ variant: "destructive", title: "Төслийг татахад алдаа гарлаа" });
     } finally {
       setIsLoading(false);
     }
@@ -44,61 +45,69 @@ export default function ProjectsAdminPage() {
   }, []);
 
   return (
-    <div className="p-4 md:p-8">
-       <header className="flex items-center justify-between mb-8">
-        <Button variant="outline" asChild>
-          <Link href="/admin/dashboard">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Буцах
-          </Link>
-        </Button>
-        <h1 className="text-3xl font-bold text-primary">Төсөл удирдах</h1>
-        <ProjectFormDialog onSave={fetchProjects} />
+    <div className="min-h-screen bg-card">
+       <header className="bg-background shadow-sm sticky top-0 z-10">
+        <div className="container mx-auto flex items-center justify-between h-20 px-4">
+            <Button variant="outline" asChild>
+            <Link href="/admin/dashboard">
+                <ArrowLeft className="mr-2 h-4 w-4" /> Буцах
+            </Link>
+            </Button>
+            <h1 className="text-xl font-bold text-foreground font-headline">Төсөл удирдах</h1>
+            <ProjectFormDialog onSave={fetchProjects}>
+                 <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Шинэ төсөл нэмэх
+                </Button>
+            </ProjectFormDialog>
+        </div>
       </header>
-
-      {isLoading ? (
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[...Array(3)].map((_, index) => (
-            <Card key={index} className="overflow-hidden">
-                <Skeleton className="h-60 w-full" />
-                <CardFooter className="p-4 flex items-center justify-between">
-                  <Skeleton className="h-6 w-3/4" />
+    <main className="container mx-auto p-4 md:p-8">
+        {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(3)].map((_, index) => (
+                <Card key={index} className="overflow-hidden">
+                    <Skeleton className="h-60 w-full" />
+                    <CardFooter className="p-4 flex items-center justify-between">
+                    <Skeleton className="h-6 w-3/4" />
+                    </CardFooter>
+                </Card>
+            ))}
+            </div>
+        ) : projects.length === 0 ? (
+            <Card className="shadow-lg">
+            <CardContent className='p-8 text-center text-muted-foreground'>Төсөл олдсонгүй.</CardContent>
+            </Card>
+        ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {projects.map((project) => (
+                <Card key={project.id} className="overflow-hidden group shadow-lg">
+                <CardContent className="p-0 relative">
+                    <Image
+                    src={project.image || "https://placehold.co/600x400.png"}
+                    alt={project.title}
+                    width={600}
+                    height={400}
+                    className="w-full h-60 object-cover"
+                    data-ai-hint={project.hint}
+                    />
+                </CardContent>
+                <CardFooter className="p-4 bg-background flex items-center justify-between">
+                    <h3 className="text-base font-semibold text-foreground font-headline truncate pr-2">{project.title}</h3>
+                    <div className='flex items-center space-x-1'>
+                        <ProjectFormDialog project={project} onSave={fetchProjects}>
+                            <Button variant="ghost" size="icon">
+                            <Edit className="h-4 w-4" />
+                            </Button>
+                        </ProjectFormDialog>
+                        <DeleteProjectDialog project={project} onSucess={fetchProjects} />
+                    </div>
                 </CardFooter>
-            </Card>
-          ))}
-        </div>
-      ) : projects.length === 0 ? (
-        <Card>
-          <CardContent className='p-8 text-center'>Төсөл олдсонгүй.</CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project) => (
-             <Card key={project.id} className="overflow-hidden group">
-              <CardContent className="p-0 relative">
-                <Image
-                  src={project.image || "https://placehold.co/600x400.png"}
-                  alt={project.title}
-                  width={600}
-                  height={400}
-                  className="w-full h-60 object-cover"
-                  data-ai-hint={project.hint}
-                />
-              </CardContent>
-              <CardFooter className="p-4 bg-card flex items-center justify-between">
-                <h3 className="text-base font-semibold text-primary font-headline">{project.title}</h3>
-                <div className='flex items-center'>
-                    <ProjectFormDialog project={project} onSave={fetchProjects}>
-                        <Button variant="ghost" size="icon">
-                        <Edit className="h-4 w-4" />
-                        </Button>
-                    </ProjectFormDialog>
-                    <DeleteProjectDialog project={project} onSucess={fetchProjects} />
-                </div>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      )}
+                </Card>
+            ))}
+            </div>
+        )}
+      </main>
     </div>
   );
 }
@@ -164,49 +173,43 @@ function ProjectFormDialog({ project, onSave, children }: { project?: Project, o
       setIsSaving(false);
     }
   };
-  
-  const trigger = children ? (
-    <div onClick={() => setOpen(true)}>{children}</div>
-  ) : (
-     <Button>
-      <PlusCircle className="mr-2 h-4 w-4" />
-      Шинэ төсөл нэмэх
-    </Button>
-  );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>{project ? 'Төсөл засах' : 'Шинэ төсөл нэмэх'}</DialogTitle>
+          <DialogDescription>Төслийн дэлгэрэнгүй мэдээллийг энд оруулна уу.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title" className="text-right">Гарчиг</Label>
-              <Input id="title" value={formData.title} onChange={handleChange} className="col-span-3" required />
+        <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6 py-4">
+            <div className="space-y-4">
+                <div>
+                    <Label htmlFor="title">Гарчиг</Label>
+                    <Input id="title" value={formData.title} onChange={handleChange} required />
+                </div>
+                <div>
+                    <Label htmlFor="description">Дэлгэрэнгүй</Label>
+                    <Textarea id="description" value={formData.description} onChange={handleChange} rows={12} required />
+                </div>
             </div>
-             <div className="grid grid-cols-4 items-start gap-4">
-              <Label className="text-right pt-2">Зураг</Label>
-               <div className='col-span-3 space-y-2'>
-                <Input id="image" type="file" onChange={handleImageChange} className="col-span-3" accept="image/*" />
-                 {imagePreview && (
-                    <div className="relative w-full h-40 rounded-md overflow-hidden border">
-                       <Image src={imagePreview} alt="Зураг" layout="fill" objectFit="cover" />
-                    </div>
-                )}
-               </div>
+            <div className="space-y-4">
+                <div>
+                    <Label htmlFor="image">Зураг</Label>
+                    <Input id="image" type="file" onChange={handleImageChange} accept="image/*" />
+                    {imagePreview && (
+                        <div className="mt-2 relative w-full h-48 rounded-md overflow-hidden border">
+                        <Image src={imagePreview} alt="Зураг" layout="fill" objectFit="cover" />
+                        </div>
+                    )}
+                </div>
+                 <div>
+                    <Label htmlFor="hint">Зургийн hint</Label>
+                    <Input id="hint" value={formData.hint} onChange={handleChange} placeholder="жишээ нь: office building" />
+                </div>
             </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="hint" className="text-right">Зургийн hint</Label>
-              <Input id="hint" value={formData.hint} onChange={handleChange} className="col-span-3" placeholder="жишээ нь: office building" />
-            </div>
-             <div className="grid grid-cols-4 items-start gap-4">
-                <Label htmlFor="description" className="text-right pt-2">Дэлгэрэнгүй</Label>
-                <Textarea id="description" value={formData.description} onChange={handleChange} className="col-span-3" rows={5} required />
-            </div>
-            <DialogFooter>
-                <DialogClose asChild><Button type="button" variant="secondary">Болих</Button></DialogClose>
+            <DialogFooter className="md:col-span-2">
+                <DialogClose asChild><Button type="button" variant="outline">Болих</Button></DialogClose>
                 <Button type="submit" disabled={isSaving}>{isSaving ? 'Хадгалж байна...' : 'Хадгалах'}</Button>
             </DialogFooter>
         </form>
@@ -242,15 +245,17 @@ function DeleteProjectDialog({ project, onSucess }: { project: Project, onSucess
             <DialogTrigger asChild>
                 <Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Устгахдаа итгэлтэй байна уу?</DialogTitle>
+                    <DialogDescription>
+                        "{project.title}" нэртэй төслийг устгах гэж байна. Энэ үйлдлийг буцаах боломжгүй.
+                    </DialogDescription>
                 </DialogHeader>
-                <p>Энэ үйлдлийг буцаах боломжгүй.</p>
-                <DialogFooter>
-                    <DialogClose asChild><Button type="button" variant="secondary">Болих</Button></DialogClose>
+                <DialogFooter className="sm:justify-start">
+                    <DialogClose asChild><Button type="button" variant="outline">Болих</Button></DialogClose>
                     <Button type="button" variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-                        {isDeleting ? "Устгаж байна..." : "Устгах"}
+                        {isDeleting ? "Устгаж байна..." : "Тийм, устгах"}
                     </Button>
                 </DialogFooter>
             </DialogContent>

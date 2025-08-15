@@ -55,7 +55,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t border-border/20 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Jiguur Grand Group. Бүх эрх хуулиар хамгаалагдсан.</p>
+          <p>&copy; {new Date().getFullYear()} Abs company Group. Бүх эрх хуулиар хамгаалагдсан.</p>
         </div>
       </div>
     </footer>

@@ -3,8 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Jiguur Grand",
-  description: "Jiguur Grand Group",
+  title: "Abs company",
+  description: "Abs company Group",
   icons: {
     icon: "/favicon.ico",
   },

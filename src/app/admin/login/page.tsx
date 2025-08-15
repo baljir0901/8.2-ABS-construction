@@ -4,11 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import Logo from '@/components/logo';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function AdminLoginPage() {
       toast({
         variant: "destructive",
         title: "Нэвтрэхэд алдаа гарлаа",
-        description: error.message,
+        description: "Имэйл эсвэл нууц үг буруу байна.",
       })
     } finally {
       setIsLoading(false);
@@ -35,10 +36,13 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <Card className="w-full max-w-md">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-card px-4">
+       <div className="mb-8">
+         <Logo />
+       </div>
+      <Card className="w-full max-w-md border-none shadow-xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Админ нэвтрэх</CardTitle>
+          <CardTitle className="text-2xl font-bold font-headline">Админ нэвтрэх</CardTitle>
           <CardDescription>Хяналтын самбарт хандахын тулд нэвтэрнэ үү.</CardDescription>
         </CardHeader>
         <CardContent>

@@ -38,12 +38,26 @@ export default function AdminLayout({
 
   if (loading) {
      return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <div className="w-full max-w-md space-y-4">
-             <Skeleton className="h-10 w-full" />
-             <Skeleton className="h-10 w-full" />
-             <Skeleton className="h-10 w-full" />
-          </div>
+        <div className="flex flex-col min-h-screen bg-card">
+            <header className="bg-background shadow-sm">
+                <div className="container mx-auto flex h-20 items-center justify-between px-4">
+                    <Skeleton className="h-10 w-36" />
+                    <div className="flex items-center gap-4">
+                        <Skeleton className="h-8 w-24" />
+                        <Skeleton className="h-9 w-24" />
+                    </div>
+                </div>
+            </header>
+            <main className="container mx-auto p-4 md:p-8">
+                 <div className="mb-8">
+                    <Skeleton className="h-9 w-64" />
+                    <Skeleton className="h-4 w-96 mt-2" />
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <Skeleton className="h-48 w-full" />
+                    <Skeleton className="h-48 w-full" />
+                 </div>
+            </main>
         </div>
     );
   }

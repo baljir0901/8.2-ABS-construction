@@ -15,7 +15,7 @@ export default function Logo() {
       </svg>
       <div className="flex flex-col">
           <span className="font-extrabold text-2xl text-foreground font-headline tracking-wider">
-            JIGUUR GRAND
+            Abs company
           </span>
            <span className="text-xs text-foreground/80 font-sans -mt-1">GROUP Est. 1989</span>
       </div>

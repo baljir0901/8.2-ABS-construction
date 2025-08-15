@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { getNews, addNews, updateNews, deleteNews, NewsArticle, uploadImage, deleteImage } from '@/lib/firebase';
 import {
@@ -23,11 +23,12 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Trash2, PlusCircle, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, PlusCircle } from 'lucide-react';
 import Image from 'next/image';
 
 export default function NewsAdminPage() {
@@ -52,56 +53,67 @@ export default function NewsAdminPage() {
   }, []);
 
   return (
-    <div className="p-4 md:p-8">
-       <header className="flex items-center justify-between mb-8">
-        <Button variant="outline" asChild>
-          <Link href="/admin/dashboard">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Буцах
-          </Link>
-        </Button>
-        <h1 className="text-3xl font-bold text-primary">Мэдээ удирдах</h1>
-        <NewsFormDialog onSave={fetchNews} />
+    <div className="min-h-screen bg-card">
+       <header className="bg-background shadow-sm sticky top-0 z-10">
+        <div className="container mx-auto flex items-center justify-between h-20 px-4">
+            <Button variant="outline" asChild>
+                <Link href="/admin/dashboard">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Буцах
+                </Link>
+            </Button>
+            <h1 className="text-xl font-bold text-foreground font-headline">Мэдээ удирдах</h1>
+            <NewsFormDialog onSave={fetchNews}>
+                <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Шинэ мэдээ нэмэх
+                </Button>
+            </NewsFormDialog>
+        </div>
       </header>
 
-      <Card>
-        <CardContent className='p-0'>
-           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Гарчиг</TableHead>
-                <TableHead>Огноо</TableHead>
-                <TableHead className='text-right'>Үйлдэл</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
+      <main className="container mx-auto p-4 md:p-8">
+        <Card className='shadow-lg'>
+            <CardContent className='p-0'>
+            <Table>
+                <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center">Уншиж байна...</TableCell>
+                    <TableHead>Гарчиг</TableHead>
+                    <TableHead>Огноо</TableHead>
+                    <TableHead>Онцлох</TableHead>
+                    <TableHead className='text-right'>Үйлдэл</TableHead>
                 </TableRow>
-              ) : news.length === 0 ? (
-                <TableRow>
-                   <TableCell colSpan={3} className="text-center">Мэдээ олдсонгүй.</TableCell>
-                </TableRow>
-              ) : (
-                news.map((article) => (
-                  <TableRow key={article.id}>
-                    <TableCell className="font-medium">{article.title}</TableCell>
-                    <TableCell>{new Date(article.date).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                       <NewsFormDialog article={article} onSave={fetchNews}>
-                         <Button variant="ghost" size="icon">
-                           <Edit className="h-4 w-4" />
-                         </Button>
-                       </NewsFormDialog>
-                       <DeleteNewsDialog article={article} onSucess={fetchNews} />
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                {isLoading ? (
+                    <TableRow>
+                    <TableCell colSpan={4} className="text-center h-24">Уншиж байна...</TableCell>
+                    </TableRow>
+                ) : news.length === 0 ? (
+                    <TableRow>
+                    <TableCell colSpan={4} className="text-center h-24">Мэдээ олдсонгүй.</TableCell>
+                    </TableRow>
+                ) : (
+                    news.map((article) => (
+                    <TableRow key={article.id}>
+                        <TableCell className="font-medium">{article.title}</TableCell>
+                        <TableCell>{new Date(article.date).toLocaleDateString()}</TableCell>
+                        <TableCell>{article.featured ? 'Тийм' : 'Үгүй'}</TableCell>
+                        <TableCell className="text-right space-x-1">
+                        <NewsFormDialog article={article} onSave={fetchNews}>
+                            <Button variant="ghost" size="icon">
+                            <Edit className="h-4 w-4" />
+                            </Button>
+                        </NewsFormDialog>
+                        <DeleteNewsDialog article={article} onSucess={fetchNews} />
+                        </TableCell>
+                    </TableRow>
+                    ))
+                )}
+                </TableBody>
+            </Table>
+            </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }
@@ -144,9 +156,7 @@ function NewsFormDialog({ article, onSave, children }: { article?: NewsArticle, 
     try {
       let imageUrl = article?.image || '';
       
-      // If a new image is selected, upload it
       if (imageFile) {
-        // If there was an old image, delete it from storage
         if (article?.image) {
           await deleteImage(article.image);
         }
@@ -176,56 +186,53 @@ function NewsFormDialog({ article, onSave, children }: { article?: NewsArticle, 
     }
   };
   
-  const trigger = children ? (
-    <div onClick={() => setOpen(true)}>{children}</div>
-  ) : (
-     <Button>
-      <PlusCircle className="mr-2 h-4 w-4" />
-      Шинэ мэдээ нэмэх
-    </Button>
-  );
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>{article ? 'Мэдээ засах' : 'Шинэ мэдээ нэмэх'}</DialogTitle>
+          <DialogDescription>Мэдээний дэлгэрэнгүй мэдээллийг энд оруулна уу.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title" className="text-right">Гарчиг</Label>
-              <Input id="title" value={formData.title} onChange={handleChange} className="col-span-3" required />
-            </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="date" className="text-right">Огноо</Label>
-              <Input id="date" type="date" value={formData.date} onChange={handleChange} className="col-span-3" required />
-            </div>
-             <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="summary" className="text-right pt-2">Хураангуй</Label>
-              <Textarea id="summary" value={formData.summary} onChange={handleChange} className="col-span-3" required />
-            </div>
-             <div className="grid grid-cols-4 items-start gap-4">
-              <Label className="text-right pt-2">Зураг</Label>
-               <div className='col-span-3 space-y-2'>
-                <Input id="image" type="file" onChange={handleImageChange} className="col-span-3" accept="image/*" />
-                 {imagePreview && (
-                    <div className="relative w-full h-40 rounded-md overflow-hidden border">
-                       <Image src={imagePreview} alt="Зураг" layout="fill" objectFit="cover" />
-                    </div>
-                )}
-               </div>
-            </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="hint" className="text-right">Зургийн hint</Label>
-              <Input id="hint" value={formData.hint} onChange={handleChange} className="col-span-3" placeholder=" жишээ нь: award ceremony" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="featured" className="text-right">Онцлох</Label>
-              <Checkbox id="featured" checked={formData.featured} onCheckedChange={handleCheckboxChange} />
+        <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+              <div className='space-y-4'>
+                <div>
+                  <Label htmlFor="title">Гарчиг</Label>
+                  <Input id="title" value={formData.title} onChange={handleChange} required />
+                </div>
+                <div>
+                    <Label htmlFor="date">Огноо</Label>
+                    <Input id="date" type="date" value={formData.date} onChange={handleChange} required />
+                </div>
+                 <div>
+                    <Label htmlFor="summary">Хураангуй</Label>
+                    <Textarea id="summary" value={formData.summary} onChange={handleChange} required rows={5}/>
+                </div>
+                 <div className="flex items-center space-x-2">
+                    <Checkbox id="featured" checked={formData.featured} onCheckedChange={handleCheckboxChange} />
+                    <Label htmlFor="featured">Онцлох мэдээ</Label>
+                </div>
+              </div>
+
+               <div className='space-y-4'>
+                 <div>
+                    <Label htmlFor="image">Зураг</Label>
+                    <Input id="image" type="file" onChange={handleImageChange} accept="image/*" />
+                    {imagePreview && (
+                        <div className="mt-2 relative w-full h-48 rounded-md overflow-hidden border">
+                        <Image src={imagePreview} alt="Зураг" layout="fill" objectFit="cover" />
+                        </div>
+                    )}
+                 </div>
+                <div>
+                    <Label htmlFor="hint">Зургийн hint</Label>
+                    <Input id="hint" value={formData.hint} onChange={handleChange} placeholder="жишээ нь: award ceremony" />
+                </div>
+              </div>
             </div>
             <DialogFooter>
-                <DialogClose asChild><Button type="button" variant="secondary">Болих</Button></DialogClose>
+                <DialogClose asChild><Button type="button" variant="outline">Болих</Button></DialogClose>
                 <Button type="submit" disabled={isSaving}>{isSaving ? 'Хадгалж байна...' : 'Хадгалах'}</Button>
             </DialogFooter>
         </form>
@@ -261,15 +268,17 @@ function DeleteNewsDialog({ article, onSucess }: { article: NewsArticle, onSuces
             <DialogTrigger asChild>
                 <Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Устгахдаа итгэлтэй байна уу?</DialogTitle>
+                     <DialogDescription>
+                        "{article.title}" гарчигтай мэдээг устгах гэж байна. Энэ үйлдлийг буцаах боломжгүй.
+                    </DialogDescription>
                 </DialogHeader>
-                <p>Энэ үйлдлийг буцаах боломжгүй.</p>
-                <DialogFooter>
-                    <DialogClose asChild><Button type="button" variant="secondary">Болих</Button></DialogClose>
+                <DialogFooter className="sm:justify-start">
+                    <DialogClose asChild><Button type="button" variant="outline">Болих</Button></DialogClose>
                     <Button type="button" variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-                        {isDeleting ? "Устгаж байна..." : "Устгах"}
+                        {isDeleting ? "Устгаж байна..." : "Тийм, устгах"}
                     </Button>
                 </DialogFooter>
             </DialogContent>
