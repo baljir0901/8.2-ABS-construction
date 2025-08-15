@@ -35,8 +35,8 @@ export default function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 transition-all duration-300",
-        isScrolled ? "bg-background/80 backdrop-blur-sm shadow-lg" : "bg-gradient-to-b from-black/60 to-transparent"
+        "sticky top-0 z-50 transition-shadow duration-300",
+        isScrolled ? "bg-background/80 backdrop-blur-sm shadow-md" : "bg-background"
       )}
     >
       <div className="container mx-auto flex h-24 items-center justify-between">
@@ -44,7 +44,7 @@ export default function Header() {
         <nav className="hidden lg:flex items-center space-x-6">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href} passHref>
-              <span className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary hover:border-b-2 hover:border-accent pb-1">
+              <span className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary">
                 {link.title}
               </span>
             </Link>

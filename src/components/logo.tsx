@@ -2,7 +2,7 @@ import { Building } from "lucide-react";
 
 export default function Logo() {
   return (
-    <a href="#home" className="flex items-center space-x-2">
+    <a href="/" className="flex items-center space-x-2">
        <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 256 256"
@@ -14,10 +14,10 @@ export default function Logo() {
         />
       </svg>
       <div className="flex flex-col">
-          <span className="font-extrabold text-2xl text-primary font-headline tracking-wider">
+          <span className="font-extrabold text-2xl text-foreground font-headline tracking-wider">
             JIGUUR GRAND
           </span>
-           <span className="text-xs text-primary/80 font-sans -mt-1">GROUP Est. 1989</span>
+           <span className="text-xs text-foreground/80 font-sans -mt-1">GROUP Est. 1989</span>
       </div>
     </a>
   );
