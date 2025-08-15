@@ -3,31 +3,24 @@ import { Button } from "@/components/ui/button";
 
 export default function HeroSection() {
   return (
-    <section id="home" className="relative h-[85vh] min-h-[600px] flex items-center justify-center text-white">
+    <section id="home" className="relative h-screen min-h-[700px] flex items-center justify-center text-white">
+      <div className="absolute inset-0 bg-black/50 z-10"></div>
       <Image
         src="https://placehold.co/1920x1080.png"
-        alt="Modern architecture background"
+        alt="Construction workers background"
         layout="fill"
         objectFit="cover"
-        className="brightness-50"
-        data-ai-hint="modern architecture"
+        className="brightness-75"
+        data-ai-hint="construction workers"
         priority
       />
-      <div className="relative z-10 text-center space-y-6 container mx-auto px-4">
-        <h1 className="text-4xl md:text-6xl font-extrabold font-headline tracking-tight animate-fade-in-down">
-          Чанартай барилга, <span className="text-accent">Бат бэх</span> ирээдүй
+      <div className="relative z-20 text-center space-y-8 container mx-auto px-4">
+        <h1 className="text-4xl md:text-7xl font-extrabold font-headline tracking-tight uppercase animate-fade-in-down">
+         Тэнгэрт тэтгэгдэж, газарт<br/> гагнагдсан их бүтээн байгуулагч
         </h1>
-        <p className="max-w-3xl mx-auto text-lg md:text-xl text-neutral-200 animate-fade-in-up">
-          ABS Build компани нь орчин үеийн дэвшилтэт техник, технологид суурилсан барилга угсралтын цогц үйлчилгээг мэргэжлийн өндөр түвшинд үзүүлж байна.
-        </p>
-        <div className="space-x-4 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-          <Button size="lg" asChild className="bg-accent hover:bg-accent/90">
-            <a href="#projects">Бидний Төслүүд</a>
-          </Button>
-          <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary">
-            <a href="#contact">Холбоо барих</a>
-          </Button>
-        </div>
+      </div>
+       <div className="absolute z-20 bottom-10 left-1/2 -translate-x-1/2">
+        <div className="w-px h-20 bg-white/50 animate-pulse"></div>
       </div>
     </section>
   );

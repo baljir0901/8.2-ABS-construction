@@ -4,14 +4,16 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Logo from "./logo";
 import { Button } from "./ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Globe, Building } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { title: "Нүүр", href: "#home" },
-  { title: "Үйлчилгээ", href: "#services" },
-  { title: "Төслүүд", href: "#projects" },
-  { title: "Мэдээ", href: "#news" },
+  { title: "Группийн танилцуулга", href: "#about" },
+  { title: "Бизнесийн салбарууд", href: "#services" },
+  { title: "Бүтээн байгуулалтууд", href: "#projects" },
+  { title: "Мэдээ мэдээлэл", href: "#news" },
+  { title: "Хүний нөөц", href: "#careers" },
+  { title: "Холбоо барих", href: "#contact" },
 ];
 
 export default function Header() {
@@ -34,33 +36,38 @@ export default function Header() {
     <header
       className={cn(
         "sticky top-0 z-50 transition-all duration-300",
-        isScrolled ? "bg-card/80 backdrop-blur-sm shadow-md" : "bg-transparent"
+        isScrolled ? "bg-background/80 backdrop-blur-sm shadow-lg" : "bg-gradient-to-b from-black/60 to-transparent"
       )}
     >
-      <div className="container mx-auto flex h-20 items-center justify-between">
+      <div className="container mx-auto flex h-24 items-center justify-between">
         <Logo />
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className="hidden lg:flex items-center space-x-6">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href} passHref>
-              <span className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary">
+              <span className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary hover:border-b-2 hover:border-accent pb-1">
                 {link.title}
               </span>
             </Link>
           ))}
         </nav>
-        <div className="hidden md:block">
-          <Button asChild>
-            <a href="#contact">Холбоо барих</a>
-          </Button>
+        <div className="hidden lg:flex items-center space-x-2">
+            <Button variant="ghost" size="icon">
+                <Globe />
+            </Button>
+             <Button variant="ghost" size="icon" asChild>
+                <Link href="/admin/dashboard">
+                    <Building />
+                </Link>
+            </Button>
         </div>
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <Button onClick={toggleMenu} variant="ghost" size="icon">
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
         </div>
       </div>
       {isMenuOpen && (
-        <div className="md:hidden bg-card/95 backdrop-blur-sm pb-4">
+        <div className="lg:hidden bg-background/95 backdrop-blur-sm pb-4">
           <nav className="container mx-auto flex flex-col items-center space-y-4">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href} passHref>
@@ -69,9 +76,16 @@ export default function Header() {
                 </span>
               </Link>
             ))}
-            <Button asChild className="w-full max-w-xs">
-              <a href="#contact" onClick={() => setIsMenuOpen(false)}>Холбоо барих</a>
-            </Button>
+             <div className="flex items-center space-x-2">
+                <Button variant="ghost" size="icon">
+                    <Globe />
+                </Button>
+                <Button variant="ghost" size="icon" asChild>
+                    <Link href="/admin/dashboard">
+                        <Building />
+                    </Link>
+                </Button>
+            </div>
           </nav>
         </div>
       )}

@@ -3,8 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ABS Build",
-  description: "ABS Барилгын Компани",
+  title: "Jiguur Grand",
+  description: "Jiguur Grand Group",
   icons: {
     icon: "/favicon.ico",
   },
@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="mn">
+    <html lang="mn" className="dark">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
