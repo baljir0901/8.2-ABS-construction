@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getProjects, Project } from "@/lib/firebase";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 export default function ProjectsSection() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -63,27 +64,24 @@ export default function ProjectsSection() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project) => (
-            <Card key={project.id} className="overflow-hidden group">
-              <CardContent className="p-0">
-                <Image
-                  src={project.image || "https://placehold.co/600x400.png"}
-                  alt={project.title}
-                  width={600}
-                  height={400}
-                  className="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"
-                  data-ai-hint={project.hint}
-                />
-              </CardContent>
-              <CardFooter className="p-4 bg-card">
-                <h3 className="text-lg font-semibold text-primary font-headline">{project.title}</h3>
-              </CardFooter>
-            </Card>
+            <Link key={project.id} href={`/projects/${project.id}`} passHref>
+                <Card className="overflow-hidden group h-full flex flex-col cursor-pointer">
+                <CardContent className="p-0">
+                    <Image
+                    src={project.image || "https://placehold.co/600x400.png"}
+                    alt={project.title}
+                    width={600}
+                    height={400}
+                    className="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"
+                    data-ai-hint={project.hint}
+                    />
+                </CardContent>
+                <CardFooter className="p-4 bg-card flex-grow">
+                    <h3 className="text-lg font-semibold text-primary font-headline">{project.title}</h3>
+                </CardFooter>
+                </Card>
+            </Link>
           ))}
-        </div>
-        <div className="text-center mt-12">
-            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                Бүх төслүүдийг харах
-            </Button>
         </div>
       </div>
     </section>

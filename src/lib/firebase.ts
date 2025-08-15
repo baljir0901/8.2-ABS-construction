@@ -11,7 +11,8 @@ import {
   deleteDoc,
   query,
   orderBy,
-  limit
+  limit,
+  getDoc
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 
@@ -46,6 +47,7 @@ export interface Project {
     title: string;
     image: string;
     hint: string;
+    description: string;
 }
 
 // Storage Functions
@@ -88,6 +90,14 @@ export const getProjects = async (): Promise<Project[]> => {
     const snapshot = await getDocs(projectsCollection);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project));
 };
+export const getProject = async(id: string): Promise<Project | null> => {
+    const docRef = doc(db, 'projects', id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() } as Project;
+    }
+    return null;
+}
 export const updateProject = (id: string, project: Partial<Project>) => updateDoc(doc(db, "projects", id), project);
 export const deleteProject = (id: string) => deleteDoc(doc(db, "projects", id));
 

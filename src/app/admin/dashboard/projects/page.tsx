@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { getProjects, addProject, updateProject, deleteProject, Project, uploadImage, deleteImage } from '@/lib/firebase';
@@ -112,6 +113,7 @@ function ProjectFormDialog({ project, onSave, children }: { project?: Project, o
   const [formData, setFormData] = useState<Omit<Project, 'id' | 'image'>>({
     title: project?.title || '',
     hint: project?.hint || '',
+    description: project?.description || '',
   });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,7 +124,7 @@ function ProjectFormDialog({ project, onSave, children }: { project?: Project, o
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
   };
@@ -175,7 +177,7 @@ function ProjectFormDialog({ project, onSave, children }: { project?: Project, o
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{project ? 'Төсөл засах' : 'Шинэ төсөл нэмэх'}</DialogTitle>
         </DialogHeader>
@@ -198,6 +200,10 @@ function ProjectFormDialog({ project, onSave, children }: { project?: Project, o
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="hint" className="text-right">Зургийн hint</Label>
               <Input id="hint" value={formData.hint} onChange={handleChange} className="col-span-3" placeholder="жишээ нь: office building" />
+            </div>
+             <div className="grid grid-cols-4 items-start gap-4">
+                <Label htmlFor="description" className="text-right pt-2">Дэлгэрэнгүй</Label>
+                <Textarea id="description" value={formData.description} onChange={handleChange} className="col-span-3" rows={5} required />
             </div>
             <DialogFooter>
                 <DialogClose asChild><Button type="button" variant="secondary">Болих</Button></DialogClose>
