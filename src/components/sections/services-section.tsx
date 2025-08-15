@@ -33,23 +33,23 @@ const services: Service[] = [
 
 export default function ServicesSection() {
   return (
-    <section id="services" className="py-20 lg:py-28 bg-card">
+    <section id="services" className="py-20 lg:py-28 bg-background">
       <div className="container mx-auto px-4">
-        <div className="text-center space-y-4 mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold font-headline text-primary">Манай Үйлчилгээ</h2>
-          <p className="max-w-2xl mx-auto text-muted-foreground">
-            Бид барилгын салбарт дараах цогц үйлчилгээнүүдийг санал болгож байна.
+        <div className="space-y-4 mb-12">
+           <p className="text-primary font-semibold text-sm tracking-widest relative pl-10 after:absolute after:w-8 after:h-px after:bg-primary after:left-0 after:top-1/2">
+             Манай үйлчилгээ
           </p>
+          <h2 className="text-3xl md:text-4xl font-bold font-headline text-foreground">Бид юу хийдэг вэ?</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {services.map((service, index) => (
-            <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300 border-t-4 border-t-primary">
+            <Card key={index} className="text-center hover:shadow-xl transition-shadow duration-300 group pt-6">
               <CardHeader className="items-center">
-                <div className="p-4 bg-primary/10 rounded-full mb-4">
-                  <service.icon className="h-10 w-10 text-primary" />
+                <div className="p-4 bg-primary/10 rounded-full mb-4 group-hover:bg-primary transition-colors duration-300">
+                  <service.icon className="h-10 w-10 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
                 </div>
-                <CardTitle className="font-headline">{service.title}</CardTitle>
-                <CardDescription className="pt-2">{service.description}</CardDescription>
+                <CardTitle className="font-headline text-lg">{service.title}</CardTitle>
+                <CardDescription className="pt-2 text-sm">{service.description}</CardDescription>
               </CardHeader>
             </Card>
           ))}
