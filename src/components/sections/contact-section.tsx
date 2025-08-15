@@ -59,16 +59,17 @@ export default function ContactSection() {
 
 
   return (
-    <section id="contact" className="py-20 lg:py-28">
+    <section id="contact" className="py-20 lg:py-28 bg-background">
       <div className="container mx-auto px-4">
-        <div className="text-center space-y-4 mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold font-headline text-primary">Холбоо барих</h2>
-          <p className="max-w-2xl mx-auto text-muted-foreground">
-            Танд асуух зүйл байвал бидэнтэй холбогдоно уу. Бид танд туслахдаа таатай байх болно.
-          </p>
-        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           <div className="space-y-8">
+             <div className="space-y-4">
+                <p className="text-primary font-semibold text-sm tracking-widest relative pl-10 after:absolute after:w-8 after:h-px after:bg-primary after:left-0 after:top-1/2">
+                    Contact us
+                </p>
+                <h2 className="text-3xl md:text-4xl font-bold font-headline text-foreground">Холбоо барих</h2>
+                <p className="text-muted-foreground">Танд асуух зүйл байвал бидэнтэй холбогдоно уу. Бид танд туслахдаа таатай байх болно.</p>
+             </div>
             <div className="flex items-start space-x-4">
               <div className="p-3 bg-primary/10 rounded-full">
                 <MapPin className="h-6 w-6 text-primary" />
@@ -97,7 +98,7 @@ export default function ContactSection() {
               </div>
             </div>
           </div>
-          <Card>
+          <Card className="border-none shadow-none bg-card p-2 rounded-lg">
             <CardContent className="p-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -106,7 +107,7 @@ export default function ContactSection() {
                 </div>
                 <Input name="subject" placeholder="Гарчиг" value={formData.subject} onChange={handleChange} required />
                 <Textarea name="message" placeholder="Таны зурвас" rows={5} value={formData.message} onChange={handleChange} required />
-                <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={isSending}>
+                <Button type="submit" className="w-full" disabled={isSending}>
                   {isSending ? 'Илгээж байна...' : 'Илгээх'}
                 </Button>
               </form>
