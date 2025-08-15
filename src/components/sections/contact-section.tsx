@@ -1,12 +1,63 @@
 "use client"
 
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Mail } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { addContactMessage } from "@/lib/firebase";
 
 export default function ContactSection() {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [isSending, setIsSending] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      toast({ variant: "destructive", title: "Бүх талбарыг бөглөнө үү." });
+      return;
+    }
+    setIsSending(true);
+    try {
+      await addContactMessage({
+        to: 'baljir0901@gmail.com', // Your email address
+        message: {
+          subject: `Шинэ холбоо барих зурвас: ${formData.subject}`,
+          html: `
+            <p><strong>Нэр:</strong> ${formData.name}</p>
+            <p><strong>Имэйл:</strong> ${formData.email}</p>
+            <hr />
+            <p><strong>Зурвас:</strong></p>
+            <p>${formData.message.replace(/\n/g, '<br>')}</p>
+          `,
+        },
+        name: formData.name,
+        email: formData.email,
+        createdAt: new Date().toISOString(),
+      });
+      toast({ title: "Амжилттай илгээлээ!", description: "Бид тантай удахгүй холбогдох болно." });
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+       toast({ variant: "destructive", title: "Илгээхэд алдаа гарлаа.", description: "Дахин оролдоно уу." });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+
   return (
     <section id="contact" className="py-20 lg:py-28">
       <div className="container mx-auto px-4">
@@ -48,14 +99,16 @@ export default function ContactSection() {
           </div>
           <Card>
             <CardContent className="p-6">
-              <form className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input placeholder="Таны нэр" />
-                  <Input type="email" placeholder="Имэйл хаяг" />
+                  <Input name="name" placeholder="Таны нэр" value={formData.name} onChange={handleChange} required />
+                  <Input name="email" type="email" placeholder="Имэйл хаяг" value={formData.email} onChange={handleChange} required />
                 </div>
-                <Input placeholder="Гарчиг" />
-                <Textarea placeholder="Таны зурвас" rows={5} />
-                <Button type="submit" className="w-full bg-accent hover:bg-accent/90">Илгээх</Button>
+                <Input name="subject" placeholder="Гарчиг" value={formData.subject} onChange={handleChange} required />
+                <Textarea name="message" placeholder="Таны зурвас" rows={5} value={formData.message} onChange={handleChange} required />
+                <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={isSending}>
+                  {isSending ? 'Илгээж байна...' : 'Илгээх'}
+                </Button>
               </form>
             </CardContent>
           </Card>

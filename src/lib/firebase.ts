@@ -50,6 +50,18 @@ export interface Project {
     description: string;
 }
 
+export interface ContactMessage {
+  id?: string;
+  to: string;
+  message: {
+    subject: string;
+    html: string;
+  };
+  name: string;
+  email: string;
+  createdAt: string;
+}
+
 // Storage Functions
 export const uploadImage = async (file: File) => {
   const storageRef = ref(storage, `images/${Date.now()}_${file.name}`);
@@ -73,6 +85,8 @@ export const deleteImage = async (imageUrl: string) => {
 // Firestore collections
 const newsCollection = collection(db, "news");
 const projectsCollection = collection(db, "projects");
+const contactsCollection = collection(db, "contacts");
+
 
 // News CRUD
 export const addNews = (news: Omit<NewsArticle, 'id'>) => addDoc(newsCollection, news);
@@ -100,6 +114,9 @@ export const getProject = async(id: string): Promise<Project | null> => {
 }
 export const updateProject = (id: string, project: Partial<Project>) => updateDoc(doc(db, "projects", id), project);
 export const deleteProject = (id: string) => deleteDoc(doc(db, "projects", id));
+
+// Contact CRUD
+export const addContactMessage = (message: Omit<ContactMessage, 'id'>) => addDoc(contactsCollection, message);
 
 
 export { app, auth, db, storage };
