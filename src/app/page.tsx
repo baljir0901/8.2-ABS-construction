@@ -6,6 +6,8 @@ import ProjectsSection from "@/components/sections/projects-section";
 import NewsSection from "@/components/sections/news-section";
 import ContactSection from "@/components/sections/contact-section";
 import AboutSection from "@/components/sections/about-section";
+import StatsSection from "@/components/sections/stats-section";
+import BusinessSectorsSection from "@/components/sections/business-sectors-section";
 
 export default function Home() {
   return (
@@ -21,7 +23,9 @@ export default function Home() {
              </div>
           </div>
         </div>
+        <StatsSection />
         <ServicesSection />
+        <BusinessSectorsSection />
         <NewsSection />
         <ContactSection />
       </main>
